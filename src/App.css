@@ -7,13 +7,15 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .app {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .app-header {
@@ -40,7 +42,8 @@ body {
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 0;
-  min-height: calc(100vh - 120px);
+  height: calc(100vh - 120px);
+  overflow: hidden;
 }
 
 .controls-panel {
@@ -49,6 +52,7 @@ body {
   overflow-y: auto;
   border-right: 3px solid #8B4513;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  height: 100%;
 }
 
 .location-form {
@@ -274,6 +278,8 @@ body {
 .map-panel {
   position: relative;
   background: #f0f0f0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .map-container {
