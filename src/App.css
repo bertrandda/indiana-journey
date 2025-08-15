@@ -206,6 +206,29 @@ body {
   border: 1px solid #D2691E;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: move;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.location-item:hover {
+  background: #F5DEB3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.location-item.dragging {
+  opacity: 0.5;
+}
+
+.drag-handle {
+  color: #8B4513;
+  font-size: 16px;
+  cursor: grab;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .location-number {
@@ -231,6 +254,21 @@ body {
 
 .location-details small {
   color: #888;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-left: 0.5rem;
+}
+
+.delete-btn:hover {
+  background: rgba(220, 20, 60, 0.1);
 }
 
 .map-panel {

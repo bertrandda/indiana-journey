@@ -13,6 +13,37 @@ function App() {
     setLocations(prev => [...prev, location])
   }
 
+  const removeLocation = (indexToRemove) => {
+    setLocations(prev => prev.filter((_, index) => index !== indexToRemove))
+  }
+
+  const moveLocation = (fromIndex, toIndex) => {
+    setLocations((prev) => {
+      const newLocations = [...prev]
+      const [movedLocation] = newLocations.splice(fromIndex, 1)
+      newLocations.splice(toIndex, 0, movedLocation)
+      return newLocations
+    })
+  }
+
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.setData('text/plain', index.toString())
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault()
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'), 10)
+    if (dragIndex !== dropIndex) {
+      moveLocation(dragIndex, dropIndex)
+    }
+  }
+
   const startJourney = () => {
     if (locations.length > 1) {
       setIsAnimating(true)
@@ -64,7 +95,15 @@ function App() {
               )
             </h3>
             {locations.map((location, index) => (
-              <div key={index} className="location-item">
+              <div
+                key={`${location.name}-${index}`}
+                className="location-item"
+                draggable
+                onDragStart={e => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={e => handleDrop(e, index)}
+              >
+                <span className="drag-handle">⋮⋮</span>
                 <span className="location-number">{index + 1}</span>
                 <div className="location-details">
                   <strong>{location.name}</strong>
@@ -76,6 +115,14 @@ function App() {
                     {location.lng.toFixed(4)}
                   </small>
                 </div>
+                <button
+                  onClick={() => removeLocation(index)}
+                  className="delete-btn"
+                  title="Remove location"
+                  type="button"
+                >
+                  ✖️
+                </button>
               </div>
             ))}
           </div>

@@ -83,8 +83,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
                 fillColor: '#dc2626',
                 color: '#dc2626',
                 weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8,
+                fillOpacity: 1,
               }}
             />
             <Marker
@@ -112,7 +111,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
         )}
 
         {/* Animated polyline */}
-        {animatedPath.length > 1 && <Polyline positions={animatedPath} color="#dc2626" weight={6} opacity={0.9} />}
+        {animatedPath.length > 1 && <Polyline positions={animatedPath} color="#dc2626" weight={6} />}
       </MapContainer>
     </div>
   )
