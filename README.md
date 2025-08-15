@@ -1,128 +1,128 @@
 # 🗺️ Indiana Jones Journey Planner
 
-Une application React interactive qui permet de planifier un voyage d'aventure et de visualiser l'itinéraire avec une animation style Indiana Jones !
+A small React app to plan adventurous routes and visualize them on a Leaflet map with an "Indiana Jones"-style animated red trail.
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-- **Formulaire interactif** : Ajoutez facilement des points géographiques avec nom, latitude et longitude
-- **Locations prédéfinies** : Boutons rapides pour ajouter des destinations célèbres
-- **Carte interactive** : Visualisation sur une carte Leaflet avec markers personnalisés
-- **Animation de trajet** : Ligne rouge animée qui dessine le parcours de point en point
-- **Interface responsive** : Adaptée pour desktop et mobile
-- **Style aventurier** : Thème visuel inspiré des films d'aventure
+- **Interactive form**: Add journey points by name and coordinates
+- **Preset locations**: Quick-add buttons for popular destinations
+- **Interactive map**: Leaflet map with custom markers
+- **Animated trail**: Red line animates from point to point
+- **Responsive UI**: Works on desktop and mobile
+- **Adventure theme**: Stylized UI inspired by adventure films
 
-## 🚀 Installation et utilisation
+## 🚀 Installation and usage
 
-### Prérequis
-- Node.js (version 14 ou supérieure)
-- npm ou yarn
+### Prerequisites
+- Node.js (version 14 or later)
+- npm or yarn
 
-### Installation
+### Install
 ```bash
 npm install
 ```
 
-### Lancement en mode développement
+### TomTom API configuration
+This app uses the TomTom API for place autocompletion. **If no TomTom API key is provided, autocomplete will be disabled** and users will need to enter coordinates manually.
+
+1. **Get a free TomTom API key**:
+   - Visit the TomTom Developer Portal: https://developer.tomtom.com/
+   - Create a free account
+   - Generate an API key
+
+2. **Configure your key**:
+```bash
+# Copy the example env file
+cp .env.example .env.local
+
+# Edit .env.local and add:
+VITE_TOMTOM_API_KEY=your_tomtom_key_here
+```
+
+3. **Restart the app**:
 ```bash
 npm run dev
 ```
 
-L'application sera accessible à l'adresse `http://localhost:5173`
+**With a TomTom key**: Autocomplete enabled
+**Without a TomTom key**: Manual coordinate entry only or use
 
-### Build pour la production
+### Run in development
+```bash
+npm run dev
+```
+
+The app will be available at the address shown in the terminal (e.g. `http://localhost:5173`).
+
+### Build for production
 ```bash
 npm run build
 ```
 
-## 🎮 Comment utiliser l'application
+## 🎮 How to use the app
 
-1. **Ajouter des points** :
-   - Utilisez le formulaire pour saisir manuellement nom, latitude et longitude
-   - Ou cliquez sur les boutons rapides pour ajouter des destinations célèbres
+1. **Add points**:
+   - Use the form to enter name and latitude/longitude
+   - Or use the Quick Add buttons to add preset locations
 
-2. **Visualiser le trajet** :
-   - Les points apparaissent sur la carte avec des markers colorés
-   - Le premier point est vert (départ), le dernier est rouge (arrivée)
+2. **View the route**:
+   - Points appear on the map with colored markers
+   - First point is the start (green), last is the destination (red)
 
-3. **Lancer l'animation** :
-   - Cliquez sur "🏃‍♂️ Start Journey" quand vous avez au moins 2 points
-   - Regardez la ligne rouge s'animer de point en point !
+3. **Start the animation**:
+   - Click "🏃‍♂️ Start Journey" once you have at least 2 points
+   - Watch the red line animate from point to point
 
-4. **Réinitialiser** :
-   - Utilisez le bouton "🗑️ Reset" pour tout effacer et recommencer
+4. **Reset**:
+   - Click "🗑️ Reset" to clear all points and start over
 
-## 🛠️ Technologies utilisées
+## 🛠️ Technologies used
 
-- **React** : Interface utilisateur
-- **Vite** : Outil de build rapide
-- **Leaflet** : Cartes interactives
-- **React Leaflet** : Intégration React pour Leaflet
-- **CSS Grid/Flexbox** : Layout responsive
+- **React**: UI
+- **Vite**: Fast build tooling
+- **Leaflet**: Interactive maps
+- **React Leaflet**: React bindings for Leaflet
+- **TomTom API**: Place autocompletion (required for autocomplete)
+- **CSS Grid / Flexbox**: Layout and responsiveness
 
-## 📂 Structure du projet
+## 📂 Project structure
 
 ```
 src/
 ├── components/
-│   ├── LocationForm.jsx    # Formulaire d'ajout de points
-│   └── MapComponent.jsx    # Composant carte avec animation
-├── App.jsx                 # Composant principal
-├── App.css                 # Styles principaux
-└── main.jsx               # Point d'entrée
+│   ├── LocationForm.jsx    # Form for adding points and autocomplete logic
+│   └── MapComponent.jsx    # Map and animation logic
+├── App.jsx                 # Main application component
+├── App.css                 # Styles
+└── main.jsx                # Entry point
 ```
 
-## 🎨 Personnalisation
+## 🎨 Customization
 
-### Modifier l'animation
-Dans `MapComponent.jsx`, vous pouvez ajuster :
-- `steps` : Nombre de points intermédiaires pour l'interpolation
-- Délais d'animation dans les `setTimeout`
-- Couleur et style de la ligne dans les props `Polyline`
+### Adjust the animation
+In `MapComponent.jsx` you can change:
+- `steps`: number of interpolation steps between points
+- animation delays in the `setTimeout` calls
+- color and styling of the `Polyline`
 
-### Ajouter des locations prédéfinies
-Dans `LocationForm.jsx`, modifiez le tableau `presetLocations` :
-```javascript
-const presetLocations = [
-  { name: 'Votre ville', lat: 48.8566, lng: 2.3522 },
-  // ... autres locations
-]
-```
+### Add preset locations
+Edit the `presetLocations` array in `LocationForm.jsx`.
 
-### Personnaliser les icônes
-Dans `MapComponent.jsx`, modifiez les URLs des icônes Leaflet ou créez vos propres icônes personnalisées.
+### Customize icons
+Change marker icon URLs in `MapComponent.jsx` or provide custom icons.
 
-## 🐛 Dépannage
+## 🐛 Troubleshooting
 
-### Les icônes de markers ne s'affichent pas
-Le projet inclut une configuration pour corriger les problèmes d'icônes Leaflet avec Vite. Si le problème persiste, vérifiez la connectivité internet (les icônes sont chargées depuis CDN).
+### Marker icons not showing
+Leaflet marker icons are loaded from a CDN — check your network connection.
 
-### La carte ne se centre pas correctement
-L'application calcule automatiquement les bounds pour inclure tous les points. Assurez-vous que les coordonnées sont valides.
+### Map bounds or centering issues
+The app automatically computes bounds for all points. Verify coordinates are valid numbers.
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-N'hésitez pas à contribuer au projet :
-1. Forkez le repository
-2. Créez une branche pour votre fonctionnalité
-3. Committez vos changements
-4. Poussez vers la branche
-5. Ouvrez une Pull Request
+Contributions welcome: fork, create a branch, commit changes, push and open a PR.
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
-
----
-
-**Bon voyage et que l'aventure commence ! 🏺⚡**+ Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+MIT

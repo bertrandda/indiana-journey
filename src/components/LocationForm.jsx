@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const LocationForm = ({ onAddLocation }) => {
   const [formData, setFormData] = useState({
@@ -6,6 +6,12 @@ const LocationForm = ({ onAddLocation }) => {
     lat: '',
     lng: ''
   })
+
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const debounceRef = useRef(null)
+  const suggestionsRef = useRef(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -30,7 +36,135 @@ const LocationForm = ({ onAddLocation }) => {
     })
 
     setFormData({ name: '', lat: '', lng: '' })
+    setShowSuggestions(false)
   }
+
+  // Fonction pour rechercher des lieux via l'API TomTom uniquement
+  const searchCities = async (query) => {
+    const TOMTOM_API_KEY = import.meta.env.VITE_TOMTOM_API_KEY || null
+    
+    // Si pas de clé TomTom, ne pas faire de recherche
+    if (!TOMTOM_API_KEY) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    if (query.length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      const tomtomResponse = await searchWithTomTom(query, TOMTOM_API_KEY)
+      if (tomtomResponse) {
+        setSuggestions(tomtomResponse)
+        setShowSuggestions(tomtomResponse.length > 0)
+      } else {
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche TomTom:', error)
+      setSuggestions([])
+      setShowSuggestions(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Recherche avec l'API TomTom
+  const searchWithTomTom = async (query, apiKey) => {
+    try {
+      const tomtomUrl = `https://api.tomtom.com/search/2/search/${encodeURIComponent(query)}.json?key=${apiKey}&typeahead=true&entityTypeSet=Municipality`
+
+      const response = await fetch(tomtomUrl)
+      
+      if (!response.ok) {
+        console.warn('TomTom API failed, falling back to Nominatim')
+        return null
+      }
+      
+      const data = await response.json()
+      
+      const places = data.results?.map(result => {
+        const address = result.address || {}
+        const position = result.position || {}
+        
+        return {
+          name: address.municipality || address.freeformAddress || result.poi?.name || 'Unknown',
+          fullAddress: address.freeformAddress || '',
+          country: address.country || '',
+          state: address.countrySubdivision || '',
+          lat: position.lat || 0,
+          lng: position.lon || 0,
+          type: result.type === 'Geography' ? 'city' : result.entityType || 'place',
+          importance: result.score || 0,
+          source: 'tomtom'
+        }
+      }).filter(place => place.lat && place.lng) || []
+
+      return places
+    } catch (error) {
+      console.warn('TomTom search failed:', error)
+      return null
+    }
+  }
+
+  // Gestion du changement dans le champ nom avec debounce
+  const handleNameChange = (e) => {
+    const value = e.target.value
+    setFormData({
+      ...formData,
+      name: value
+    })
+
+    // Seulement si on a une clé TomTom
+    const TOMTOM_API_KEY = import.meta.env.VITE_TOMTOM_API_KEY || null
+    if (!TOMTOM_API_KEY) {
+      return
+    }
+
+    // Débounce pour éviter trop de requêtes
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
+    debounceRef.current = setTimeout(() => {
+      searchCities(value)
+    }, 300) // Attendre 300ms après la dernière frappe
+  }
+
+  // Sélectionner une suggestion
+  const selectSuggestion = (city) => {
+    setFormData({
+      name: city.name,
+      lat: city.lat.toString(),
+      lng: city.lng.toString()
+    })
+    setShowSuggestions(false)
+    setSuggestions([])
+  }
+
+  // Gérer les clics en dehors des suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+        setShowSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+      }
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     setFormData({
@@ -53,21 +187,52 @@ const LocationForm = ({ onAddLocation }) => {
     onAddLocation(location)
   }
 
+  // Vérifier quelle API est disponible
+  const TOMTOM_API_KEY = import.meta.env.VITE_TOMTOM_API_KEY || null
+  const autocompleteEnabled = !!TOMTOM_API_KEY
+
   return (
     <div className="location-form">
       <h3>Add Journey Point</h3>
       
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className="form-group autocomplete-container">
           <label htmlFor="name">Location Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="e.g., Paris, Temple of Doom..."
-          />
+          <div className="input-container">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleNameChange}
+              placeholder={autocompleteEnabled ? "e.g., Paris, London, New York..." : "Enter location name manually"}
+              autoComplete="off"
+            />
+            {isLoading && autocompleteEnabled && (
+              <div className="loading-indicator">🔍</div>
+            )}
+            {showSuggestions && suggestions.length > 0 && autocompleteEnabled && (
+              <div className="suggestions-list" ref={suggestionsRef}>
+                {suggestions.map((city, index) => (
+                  <div
+                    key={index}
+                    className="suggestion-item"
+                    onClick={() => selectSuggestion(city)}
+                  >
+                    <div className="suggestion-main">
+                      <strong>{city.name}</strong>
+                      <span className="suggestion-type">({city.type})</span>
+                    </div>
+                    {(city.state || city.country) && (
+                      <div className="suggestion-location">
+                        {city.state && `${city.state}, `}{city.country}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="form-row">
