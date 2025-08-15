@@ -352,3 +352,7 @@ body {
   font-size: 0.8rem;
   color: #666;
 }
+
+.leaflet-tile-pane {
+  filter: sepia(0.3) saturate(0.7) contrast(1.1) brightness(0.9) hue-rotate(10deg);
+}

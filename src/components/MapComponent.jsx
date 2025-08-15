@@ -97,8 +97,8 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     <div className="map-container">
       <MapContainer ref={mapRef} center={center} zoom={4} style={{ height: '100%', width: '100%' }}>
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='Original map by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.'
+          url="https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg"
         />
 
         {/* Render markers */}
