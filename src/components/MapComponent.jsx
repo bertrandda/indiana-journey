@@ -3,22 +3,21 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// Fix pour les icônes Leaflet avec Vite
+// Fix Leaflet icons when using Vite by setting default icon URLs
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
 })
 
 const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
   const [animatedPath, setAnimatedPath] = useState([])
   const [center, setCenter] = useState([48.8566, 2.3522])
-  const [currentSegment, setCurrentSegment] = useState(0)
   const animationRef = useRef(null)
   const mapRef = useRef(null)
 
-  // Créer une icône custom pour le point de départ
+  // Custom icon for the starting point
   const startIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -28,7 +27,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     shadowSize: [41, 41]
   })
 
-  // Créer une icône custom pour le point d'arrivée
+  // Custom icon for other points
   const endIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -38,7 +37,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     shadowSize: [41, 41]
   })
 
-  // Fonction pour interpoler entre deux points
+  // Function to interpolate points between two coordinates
   const interpolatePoints = (start, end, steps = 100) => {
     const points = []
     for (let i = 0; i <= steps; i++) {
@@ -50,14 +49,11 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     return points
   }
 
-  // Animation de la ligne
+  // Animate the line segment by segment
   useEffect(() => {
-    if (!isAnimating || locations.length < 2) {
-      return
-    }
+    if (!isAnimating || locations.length < 2) return
 
     setAnimatedPath([])
-    setCurrentSegment(0)
 
     const animateSegment = (segmentIndex) => {
       if (segmentIndex >= locations.length - 1) {
@@ -70,15 +66,13 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
       const segmentPoints = interpolatePoints(start, end)
 
       let pointIndex = -1
-
       const animatePoint = () => {
         pointIndex++
         if (segmentPoints[pointIndex]) {
-          setAnimatedPath(prev => [...prev, segmentPoints[pointIndex]])
+          setAnimatedPath((prev) => [...prev, segmentPoints[pointIndex]])
           setCenter(segmentPoints[pointIndex])
           animationRef.current = setTimeout(animatePoint, 50)
         } else {
-          setCurrentSegment(segmentIndex + 1)
           setTimeout(() => animateSegment(segmentIndex + 1), 50)
         }
       }
@@ -89,47 +83,38 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     animateSegment(0)
 
     return () => {
-      if (animationRef.current) {
-        clearTimeout(animationRef.current)
-      }
+      if (animationRef.current) clearTimeout(animationRef.current)
     }
   }, [isAnimating, locations, onAnimationComplete])
 
   useEffect(() => {
     if (mapRef.current && center) {
-      mapRef.current.setView(center, mapRef.current.getZoom());
+      mapRef.current.setView(center, mapRef.current.getZoom())
     }
-  }, [center]);
+  }, [center])
 
   return (
     <div className="map-container">
-      <MapContainer
-        ref={mapRef}
-        center={center}
-        zoom={4}
-        style={{ height: '100%', width: '100%' }}
-      >
+      <MapContainer ref={mapRef} center={center} zoom={4} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Afficher tous les markers */}
+        {/* Render markers */}
         {locations.map((location, index) => {
           let icon = null
           if (index === 0) icon = startIcon
           else if (index === locations.length - 1) icon = endIcon
 
           return (
-            <Marker
-              key={index}
-              position={[location.lat, location.lng]}
-              icon={icon}
-            >
+            <Marker key={index} position={[location.lat, location.lng]} icon={icon}>
               <Popup>
                 <div>
-                  <strong>{location.name}</strong><br />
-                  Point {index + 1}<br />
+                  <strong>{location.name}</strong>
+                  <br />
+                  Point {index + 1}
+                  <br />
                   {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
                 </div>
               </Popup>
@@ -137,45 +122,14 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
           )
         })}
 
-        {/* Ligne statique (affichée quand pas d'animation) */}
+        {/* Static polyline shown when not animating */}
         {!isAnimating && locations.length > 1 && animatedPath.length < 1 && (
-          <Polyline
-            positions={locations.map(loc => [loc.lat, loc.lng])}
-            color="gray"
-            weight={2}
-            opacity={0.5}
-            dashArray="5, 10"
-          />
+          <Polyline positions={locations.map((loc) => [loc.lat, loc.lng])} color="gray" weight={2} opacity={0.5} dashArray="5, 10" />
         )}
 
-        {/* Ligne animée */}
-        {animatedPath.length > 1 && (
-          <Polyline
-            positions={animatedPath}
-            color="#dc2626"
-            weight={4}
-            opacity={0.8}
-          />
-        )}
+        {/* Animated polyline */}
+        {animatedPath.length > 1 && <Polyline positions={animatedPath} color="#dc2626" weight={4} opacity={0.8} />}
       </MapContainer>
-
-      {isAnimating && (
-        <div className="animation-overlay">
-          <div className="animation-status">
-            <div className="status-text">
-              🏃‍♂️ Following the adventure trail...
-            </div>
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{
-                  width: `${((currentSegment) / (locations.length - 1)) * 100}%`
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
