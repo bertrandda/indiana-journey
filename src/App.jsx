@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useSound from 'use-sound';
 import LocationForm from './components/LocationForm'
 import MapComponent from './components/MapComponent'
 import './App.css'
@@ -6,6 +7,7 @@ import './App.css'
 function App() {
   const [locations, setLocations] = useState([])
   const [isAnimating, setIsAnimating] = useState(false)
+  const [play, { stop }] = useSound('../../indiana-jones-theme.ogg');
 
   const addLocation = (location) => {
     setLocations(prev => [...prev, location])
@@ -14,7 +16,13 @@ function App() {
   const startJourney = () => {
     if (locations.length > 1) {
       setIsAnimating(true)
+      play()
     }
+  }
+
+  const endJourney = () => {
+    setIsAnimating(false)
+    stop()
   }
 
   const resetJourney = () => {
@@ -28,20 +36,20 @@ function App() {
         <h1>🗺️ Indiana Jones Journey Planner</h1>
         <p>Plan your adventure and watch the journey unfold!</p>
       </header>
-      
+
       <div className="app-content">
         <div className="controls-panel">
           <LocationForm onAddLocation={addLocation} />
-          
+
           <div className="action-buttons">
-            <button 
-              onClick={startJourney} 
+            <button
+              onClick={startJourney}
               disabled={locations.length < 2 || isAnimating}
               className="journey-btn"
             >
               🏃‍♂️ Start Journey
             </button>
-            <button 
+            <button
               onClick={resetJourney}
               className="reset-btn"
             >
@@ -65,10 +73,10 @@ function App() {
         </div>
 
         <div className="map-panel">
-          <MapComponent 
-            locations={locations} 
+          <MapComponent
+            locations={locations}
             isAnimating={isAnimating}
-            onAnimationComplete={() => setIsAnimating(false)}
+            onAnimationComplete={endJourney}
           />
         </div>
       </div>
