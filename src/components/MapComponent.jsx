@@ -1,41 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Marker, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-
-// Fix Leaflet icons when using Vite by setting default icon URLs
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-})
 
 const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
   const [animatedPath, setAnimatedPath] = useState([])
   const [center, setCenter] = useState([48.8566, 2.3522])
   const animationRef = useRef(null)
   const mapRef = useRef(null)
-
-  // Custom icon for the starting point
-  const startIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  })
-
-  // Custom icon for other points
-  const endIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  })
 
   // Function to interpolate points between two coordinates
   const interpolatePoints = (start, end, steps = 100) => {
@@ -101,30 +73,38 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
           url="https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg"
         />
 
-        {/* Render markers */}
-        {locations.map((location, index) => {
-          let icon = null
-          if (index === 0) icon = startIcon
-          else if (index === locations.length - 1) icon = endIcon
-
-          return (
-            <Marker key={index} position={[location.lat, location.lng]} icon={icon}>
-              <Popup>
-                <div>
-                  <strong>{location.name}</strong>
-                  <br />
-                  Point
-                  {' '}
-                  {index + 1}
-                  <br />
-                  {location.lat.toFixed(4)}
-                  ,
-                  {location.lng.toFixed(4)}
-                </div>
-              </Popup>
-            </Marker>
-          )
-        })}
+        {/* Render red circle markers with city names */}
+        {locations.map((location, index) => (
+          <div key={index}>
+            <CircleMarker
+              center={[location.lat, location.lng]}
+              radius={8}
+              pathOptions={{
+                fillColor: '#dc2626',
+                color: '#dc2626',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+              }}
+            />
+            <Marker
+              position={[location.lat, location.lng]}
+              icon={L.divIcon({
+                html: `<div style="
+                  color: #8B4513;
+                  font-weight: bold;
+                  font-size: 20px;
+                  text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+                  white-space: nowrap;
+                  transform: translate(-50%, 15px);
+                ">${location.name}</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0],
+                className: 'city-label',
+              })}
+            />
+          </div>
+        ))}
 
         {/* Static polyline shown when not animating */}
         {!isAnimating && locations.length > 1 && animatedPath.length < 1 && (
@@ -132,7 +112,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
         )}
 
         {/* Animated polyline */}
-        {animatedPath.length > 1 && <Polyline positions={animatedPath} color="#dc2626" weight={4} opacity={0.8} />}
+        {animatedPath.length > 1 && <Polyline positions={animatedPath} color="#dc2626" weight={6} opacity={0.9} />}
       </MapContainer>
     </div>
   )
