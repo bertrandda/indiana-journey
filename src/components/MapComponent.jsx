@@ -13,8 +13,10 @@ L.Icon.Default.mergeOptions({
 
 const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
   const [animatedPath, setAnimatedPath] = useState([])
+  const [center, setCenter] = useState([48.8566, 2.3522])
   const [currentSegment, setCurrentSegment] = useState(0)
   const animationRef = useRef(null)
+  const mapRef = useRef(null)
 
   // Créer une icône custom pour le point de départ
   const startIcon = new L.Icon({
@@ -37,7 +39,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
   })
 
   // Fonction pour interpoler entre deux points
-  const interpolatePoints = (start, end, steps = 50) => {
+  const interpolatePoints = (start, end, steps = 100) => {
     const points = []
     for (let i = 0; i <= steps; i++) {
       const ratio = i / steps
@@ -51,8 +53,6 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
   // Animation de la ligne
   useEffect(() => {
     if (!isAnimating || locations.length < 2) {
-      setAnimatedPath([])
-      setCurrentSegment(0)
       return
     }
 
@@ -67,7 +67,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
 
       const start = locations[segmentIndex]
       const end = locations[segmentIndex + 1]
-      const segmentPoints = interpolatePoints(start, end, 30)
+      const segmentPoints = interpolatePoints(start, end)
 
       let pointIndex = -1
 
@@ -75,10 +75,11 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
         pointIndex++
         if (segmentPoints[pointIndex]) {
           setAnimatedPath(prev => [...prev, segmentPoints[pointIndex]])
-          animationRef.current = setTimeout(animatePoint, 100) // 100ms entre chaque point
+          setCenter(segmentPoints[pointIndex])
+          animationRef.current = setTimeout(animatePoint, 50)
         } else {
           setCurrentSegment(segmentIndex + 1)
-          setTimeout(() => animateSegment(segmentIndex + 1), 100) // Pause de 500ms entre les segments
+          setTimeout(() => animateSegment(segmentIndex + 1), 50)
         }
       }
 
@@ -94,32 +95,19 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     }
   }, [isAnimating, locations, onAnimationComplete])
 
-  // Calculer les bounds pour centrer la carte
-  const getBounds = () => {
-    if (locations.length === 0) return null
-
-    const lats = locations.map(loc => loc.lat)
-    const lngs = locations.map(loc => loc.lng)
-
-    return [
-      [Math.min(...lats), Math.min(...lngs)],
-      [Math.max(...lats), Math.max(...lngs)]
-    ]
-  }
-
-  const bounds = getBounds()
-  const center = locations.length > 0
-    ? [locations[0].lat, locations[0].lng]
-    : [48.8566, 2.3522] // Paris par défaut
+  useEffect(() => {
+    if (mapRef.current && center) {
+      mapRef.current.setView(center, mapRef.current.getZoom());
+    }
+  }, [center]);
 
   return (
     <div className="map-container">
       <MapContainer
+        ref={mapRef}
         center={center}
-        zoom={3}
+        zoom={4}
         style={{ height: '100%', width: '100%' }}
-        bounds={bounds}
-        boundsOptions={{ padding: [20, 20] }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -150,7 +138,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
         })}
 
         {/* Ligne statique (affichée quand pas d'animation) */}
-        {!isAnimating && locations.length > 1 && (
+        {!isAnimating && locations.length > 1 && animatedPath.length < 1 && (
           <Polyline
             positions={locations.map(loc => [loc.lat, loc.lng])}
             color="gray"
@@ -161,7 +149,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
         )}
 
         {/* Ligne animée */}
-        {isAnimating && animatedPath.length > 1 && (
+        {animatedPath.length > 1 && (
           <Polyline
             positions={animatedPath}
             color="#dc2626"
