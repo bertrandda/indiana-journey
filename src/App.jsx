@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import useSound from 'use-sound';
+import useSound from 'use-sound'
 import LocationForm from './components/LocationForm'
 import MapComponent from './components/MapComponent'
 import './App.css'
@@ -7,7 +7,7 @@ import './App.css'
 function App() {
   const [locations, setLocations] = useState([])
   const [isAnimating, setIsAnimating] = useState(false)
-  const [play, { stop }] = useSound('../../indiana-jones-theme.ogg');
+  const [play, { stop }] = useSound('../../indiana-jones-theme.ogg')
 
   const addLocation = (location) => {
     setLocations(prev => [...prev, location])
@@ -58,14 +58,23 @@ function App() {
           </div>
 
           <div className="locations-list">
-            <h3>Journey Points ({locations.length})</h3>
+            <h3>
+              Journey Points (
+              {locations.length}
+              )
+            </h3>
             {locations.map((location, index) => (
               <div key={index} className="location-item">
                 <span className="location-number">{index + 1}</span>
                 <div className="location-details">
                   <strong>{location.name}</strong>
                   <br />
-                  <small>{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</small>
+                  <small>
+                    {location.lat.toFixed(4)}
+                    ,
+                    {' '}
+                    {location.lng.toFixed(4)}
+                  </small>
                 </div>
               </div>
             ))}

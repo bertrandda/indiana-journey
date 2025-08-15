@@ -86,10 +86,10 @@ const LocationForm = ({ onAddLocation }) => {
             lng: position.lon || 0,
             type: result.type === 'Geography' ? 'city' : result.entityType || 'place',
             importance: result.score || 0,
-            source: 'tomtom'
+            source: 'tomtom',
           }
         })
-        .filter((p) => p.lat && p.lng)
+        .filter(p => p.lat && p.lng)
       return places
     } catch (error) {
       console.warn('TomTom search failed:', error)
@@ -100,7 +100,7 @@ const LocationForm = ({ onAddLocation }) => {
   // Handle change in the name field with debounce
   const handleNameChange = (e) => {
     const value = e.target.value
-    setFormData((prev) => ({ ...prev, name: value }))
+    setFormData(prev => ({ ...prev, name: value }))
 
     const TOMTOM_API_KEY = import.meta.env.VITE_TOMTOM_API_KEY || null
     if (!TOMTOM_API_KEY) return
@@ -111,7 +111,6 @@ const LocationForm = ({ onAddLocation }) => {
     }, 300)
   }
 
-  // Select a suggestion from autocomplete
   const selectSuggestion = (city) => {
     setFormData({ name: city.name, lat: city.lat.toString(), lng: city.lng.toString() })
     setShowSuggestions(false)
@@ -133,7 +132,7 @@ const LocationForm = ({ onAddLocation }) => {
   }, [])
 
   const handleInputChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   // Some preset locations to ease testing
@@ -143,10 +142,10 @@ const LocationForm = ({ onAddLocation }) => {
     { name: 'New York', lat: 40.7128, lng: -74.0060 },
     { name: 'Tokyo', lat: 35.6762, lng: 139.6503 },
     { name: 'Cairo', lat: 30.0444, lng: 31.2357 },
-    { name: 'Machu Picchu', lat: -13.1631, lng: -72.5450 }
+    { name: 'Machu Picchu', lat: -13.1631, lng: -72.5450 },
   ]
 
-  const addPresetLocation = (location) => onAddLocation(location)
+  const addPresetLocation = location => onAddLocation(location)
 
   const TOMTOM_API_KEY = import.meta.env.VITE_TOMTOM_API_KEY || null
   const autocompleteEnabled = !!TOMTOM_API_KEY
@@ -174,11 +173,16 @@ const LocationForm = ({ onAddLocation }) => {
                   <div key={index} className="suggestion-item" onClick={() => selectSuggestion(city)}>
                     <div className="suggestion-main">
                       <strong>{city.name}</strong>
-                      <span className="suggestion-type">({city.type})</span>
+                      <span className="suggestion-type">
+                        (
+                        {city.type}
+                        )
+                      </span>
                     </div>
                     {(city.state || city.country) && (
                       <div className="suggestion-location">
-                        {city.state && `${city.state}, `}{city.country}
+                        {city.state && `${city.state}, `}
+                        {city.country}
                       </div>
                     )}
                   </div>

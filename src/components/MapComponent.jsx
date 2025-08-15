@@ -8,7 +8,7 @@ delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
 
 const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
@@ -24,7 +24,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    shadowSize: [41, 41],
   })
 
   // Custom icon for other points
@@ -34,7 +34,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    shadowSize: [41, 41],
   })
 
   // Function to interpolate points between two coordinates
@@ -69,7 +69,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
       const animatePoint = () => {
         pointIndex++
         if (segmentPoints[pointIndex]) {
-          setAnimatedPath((prev) => [...prev, segmentPoints[pointIndex]])
+          setAnimatedPath(prev => [...prev, segmentPoints[pointIndex]])
           setCenter(segmentPoints[pointIndex])
           animationRef.current = setTimeout(animatePoint, 50)
         } else {
@@ -113,9 +113,13 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
                 <div>
                   <strong>{location.name}</strong>
                   <br />
-                  Point {index + 1}
+                  Point
+                  {' '}
+                  {index + 1}
                   <br />
-                  {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                  {location.lat.toFixed(4)}
+                  ,
+                  {location.lng.toFixed(4)}
                 </div>
               </Popup>
             </Marker>
@@ -124,7 +128,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
 
         {/* Static polyline shown when not animating */}
         {!isAnimating && locations.length > 1 && animatedPath.length < 1 && (
-          <Polyline positions={locations.map((loc) => [loc.lat, loc.lng])} color="gray" weight={2} opacity={0.5} dashArray="5, 10" />
+          <Polyline positions={locations.map(loc => [loc.lat, loc.lng])} color="gray" weight={2} opacity={0.5} dashArray="5, 10" />
         )}
 
         {/* Animated polyline */}
