@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Marker, Polyline } from 'react-leaflet'
 import { divIcon, LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
+const MapComponent = memo(({ locations, isAnimating, onAnimationComplete }) => {
   const [animatedPath, setAnimatedPath] = useState([])
   const [center, setCenter] = useState([48.8566, 2.3522])
   const animationRef = useRef(null)
@@ -130,6 +130,6 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
       </MapContainer>
     </div>
   )
-}
+})
 
 export default MapComponent

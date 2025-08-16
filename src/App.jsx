@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import useSound from 'use-sound'
 import LocationForm from './components/LocationForm'
 import MapComponent from './components/MapComponent'
@@ -7,6 +7,7 @@ import './App.css'
 function App() {
   const [locations, setLocations] = useState([])
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(true)
   const [play, { stop }] = useSound('../../indiana-jones-theme-cut.ogg')
 
   const addLocation = (location) => {
@@ -51,24 +52,35 @@ function App() {
     }
   }
 
-  const endJourney = () => {
+  const endJourney = useCallback(() => {
     setIsAnimating(false)
     stop()
-  }
+  }, [stop])
 
-  const resetJourney = () => {
+  const resetJourney = useCallback(() => {
     setLocations([])
     endJourney()
+  }, [endJourney])
+
+  const togglePanel = () => {
+    setIsPanelOpen(prev => !prev)
   }
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>🗺️ Your Indiana Jones journey</h1>
-      </header>
-
       <div className="app-content">
-        <div className="controls-panel">
+        <button
+          className="panel-toggle"
+          onClick={togglePanel}
+          title={isPanelOpen ? 'Close panel' : 'Open panel'}
+        >
+          {isPanelOpen ? '×' : '☰'}
+        </button>
+
+        <div className={`controls-panel ${isPanelOpen ? 'open' : ''}`}>
+          <header className="app-header">
+            <h1>🗺️ Your Indiana Jones journey</h1>
+          </header>
           <LocationForm onAddLocation={addLocation} />
 
           <div className="action-buttons">
