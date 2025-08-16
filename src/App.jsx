@@ -48,6 +48,7 @@ function App() {
   const startJourney = () => {
     if (locations.length > 1) {
       setIsAnimating(true)
+      setIsPanelOpen(false)
       play()
     }
   }

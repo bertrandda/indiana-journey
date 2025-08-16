@@ -50,7 +50,7 @@ body {
   top: 20px;
   left: 20px;
   z-index: 1001;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   color: #F4A460;
   border: none;
   border-radius: 8px;

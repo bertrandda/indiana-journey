@@ -22,8 +22,7 @@ const MapComponent = memo(({ locations, isAnimating, onAnimationComplete }) => {
   }
 
   const getZoomForDistance = (distance) => {
-    if (distance < 50) return 9
-    if (distance < 200) return 7
+    if (distance < 500) return 7
     if (distance < 1000) return 6
 
     return 4
@@ -77,7 +76,12 @@ const MapComponent = memo(({ locations, isAnimating, onAnimationComplete }) => {
   useEffect(() => {
     if (locations.length === 0) {
       setAnimatedPath([])
+
+      return
     }
+
+    const bounds = locations.map(loc => [loc.lat, loc.lng])
+    mapRef.current.fitBounds(bounds)
   }, [locations])
 
   return (
