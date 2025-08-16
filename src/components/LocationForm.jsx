@@ -203,7 +203,9 @@ const LocationForm = ({ onAddLocation }) => {
           </div>
         </div>
 
-        <button type="submit" className="add-btn">📍 Add Location</button>
+        <button type="submit" className="add-btn" disabled={Object.values(formData).includes('')}>
+          📍 Add Location
+        </button>
       </form>
 
       <div className="preset-locations">

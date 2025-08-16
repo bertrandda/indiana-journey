@@ -117,6 +117,18 @@ body {
   box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
 }
 
+.add-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.add-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .preset-locations {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
