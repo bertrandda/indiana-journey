@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Marker, Polyline } from 'react-leaflet'
-import L from 'leaflet'
+import { divIcon, LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
@@ -21,11 +21,17 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     return points
   }
 
+  const getZoomForDistance = (distance) => {
+    if (distance < 50) return 9
+    if (distance < 200) return 7
+    if (distance < 1000) return 6
+
+    return 4
+  }
+
   // Animate the line segment by segment
   useEffect(() => {
     if (!isAnimating || locations.length < 2) return
-
-    setAnimatedPath([])
 
     const animateSegment = (segmentIndex) => {
       if (segmentIndex >= locations.length - 1) {
@@ -36,6 +42,8 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
       const start = locations[segmentIndex]
       const end = locations[segmentIndex + 1]
       const segmentPoints = interpolatePoints(start, end)
+      const distance = new LatLng(start.lat, start.lng).distanceTo(new LatLng(end.lat, end.lng)) / 1000
+      mapRef.current.setView(start, getZoomForDistance(distance))
 
       let pointIndex = -1
       const animatePoint = () => {
@@ -45,13 +53,14 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
           setCenter(segmentPoints[pointIndex])
           animationRef.current = setTimeout(animatePoint, 50)
         } else {
-          setTimeout(() => animateSegment(segmentIndex + 1), 50)
+          setTimeout(() => animateSegment(segmentIndex + 1), 10)
         }
       }
 
       animatePoint()
     }
 
+    setAnimatedPath([])
     animateSegment(0)
 
     return () => {
@@ -65,9 +74,15 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
     }
   }, [center])
 
+  useEffect(() => {
+    if (locations.length === 0) {
+      setAnimatedPath([])
+    }
+  }, [locations])
+
   return (
     <div className="map-container">
-      <MapContainer ref={mapRef} center={center} zoom={4} style={{ height: '100%', width: '100%' }}>
+      <MapContainer ref={mapRef} center={center} zoom={4} style={{ height: '100%', width: '100%' }} zoomControl={false}>
         <TileLayer
           attribution='Original map by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.'
           url="https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg"
@@ -88,7 +103,7 @@ const MapComponent = ({ locations, isAnimating, onAnimationComplete }) => {
             />
             <Marker
               position={[location.lat, location.lng]}
-              icon={L.divIcon({
+              icon={divIcon({
                 html: `<div style="
                   color: #8B4513;
                   font-weight: bold;

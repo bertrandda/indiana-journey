@@ -7,7 +7,7 @@ import './App.css'
 function App() {
   const [locations, setLocations] = useState([])
   const [isAnimating, setIsAnimating] = useState(false)
-  const [play, { stop }] = useSound('../../indiana-jones-theme.ogg')
+  const [play, { stop }] = useSound('../../indiana-jones-theme-cut.ogg')
 
   const addLocation = (location) => {
     setLocations(prev => [...prev, location])
@@ -58,14 +58,13 @@ function App() {
 
   const resetJourney = () => {
     setLocations([])
-    setIsAnimating(false)
+    endJourney()
   }
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🗺️ Indiana Jones Journey Planner</h1>
-        <p>Plan your adventure and watch the journey unfold!</p>
+        <h1>🗺️ Your Indiana Jones journey</h1>
       </header>
 
       <div className="app-content">
@@ -74,11 +73,11 @@ function App() {
 
           <div className="action-buttons">
             <button
-              onClick={startJourney}
-              disabled={locations.length < 2 || isAnimating}
+              onClick={isAnimating ? endJourney : startJourney}
+              disabled={locations.length < 2}
               className="journey-btn"
             >
-              🏃‍♂️ Start Journey
+              {isAnimating ? 'Stop' : 'Start'}
             </button>
             <button
               onClick={resetJourney}

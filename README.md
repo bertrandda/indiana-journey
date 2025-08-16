@@ -70,7 +70,7 @@ npm run build
    - First point is the start (green), last is the destination (red)
 
 3. **Start the animation**:
-   - Click "🏃‍♂️ Start Journey" once you have at least 2 points
+   - Click "Start" once you have at least 2 points
    - Watch the red line animate from point to point
 
 4. **Reset**:

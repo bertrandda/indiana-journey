@@ -155,7 +155,7 @@ const LocationForm = ({ onAddLocation }) => {
       <h3>Add Journey Point</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group autocomplete-container">
-          <label htmlFor="name">Location Name:</label>
+          <label htmlFor="name">City Name:</label>
           <div className="input-container">
             <input
               type="text"
