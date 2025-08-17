@@ -20,6 +20,9 @@ concurrency:
   group: 'pages'
   cancel-in-progress: true
 
+env:
+  VITE_TOMTOM_API_KEY: ${{ secrets.VITE_TOMTOM_API_KEY }}
+
 jobs:
   # Single deploy job since we're just deploying
   deploy:
