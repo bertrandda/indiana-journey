@@ -32,8 +32,8 @@ This app uses the TomTom API for place autocompletion. **If no TomTom API key is
 
 2. **Configure your key**:
 ```bash
-# Copy the example env file
-cp .env.example .env.local
+# Copy the sample env file
+cp .env.sample .env.local
 
 # Edit .env.local and add:
 VITE_TOMTOM_API_KEY=your_tomtom_key_here
@@ -96,28 +96,6 @@ src/
 ├── App.css                 # Styles
 └── main.jsx                # Entry point
 ```
-
-## 🎨 Customization
-
-### Adjust the animation
-In `MapComponent.jsx` you can change:
-- `steps`: number of interpolation steps between points
-- animation delays in the `setTimeout` calls
-- color and styling of the `Polyline`
-
-### Add preset locations
-Edit the `presetLocations` array in `LocationForm.jsx`.
-
-### Customize icons
-Change marker icon URLs in `MapComponent.jsx` or provide custom icons.
-
-## 🐛 Troubleshooting
-
-### Marker icons not showing
-Leaflet marker icons are loaded from a CDN — check your network connection.
-
-### Map bounds or centering issues
-The app automatically computes bounds for all points. Verify coordinates are valid numbers.
 
 ## 🤝 Contributing
 
