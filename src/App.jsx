@@ -8,7 +8,7 @@ function App() {
   const [locations, setLocations] = useState([])
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPanelOpen, setIsPanelOpen] = useState(true)
-  const [play, { stop }] = useSound('../../indiana-jones-theme-cut.ogg')
+  const [play, { stop }] = useSound('../../indiana-journey/indiana-jones-theme-cut.ogg')
 
   const addLocation = (location) => {
     setLocations(prev => [...prev, location])
